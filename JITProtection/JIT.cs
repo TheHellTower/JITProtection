@@ -23,10 +23,12 @@ namespace JITProtection
             AssemblyByte = null;
 
             #region "Inject Runtime"
-            string tellMeMore = x64 ? "64" : "86";
-            byte[] array = File.ReadAllBytes($"{Environment.CurrentDirectory}\\Runtime_x{tellMeMore}.dll");
-            EmbeddedResource DLLResource = new EmbeddedResource("DLL", array, ManifestResourceAttributes.Public);
-            Module.Resources.Add(DLLResource);
+            foreach (string path in new string[] { $"{Environment.CurrentDirectory}\\Runtime_x86.dll", $"{Environment.CurrentDirectory}\\Runtime_x64.dll" })
+            {
+                byte[] array = File.ReadAllBytes(path);
+                EmbeddedResource DLLResource = new EmbeddedResource(Path.GetFileName(path), array, ManifestResourceAttributes.Public);
+                Module.Resources.Add(DLLResource);
+            }
 
             Type RuntimeType = typeof(Runtime);
             ModuleDefMD RuntimeModule = ModuleDefMD.Load(RuntimeType.Module);
@@ -87,7 +89,7 @@ namespace JITProtection
         public static void EncryptDecrypt(byte[] data)
         {
             //Hardcoded because gay
-            byte[] array = Convert.FromBase64String("W2h0dHBzOi8vZ2l0aHViLmNvbS9UaGVIZWxsVG93ZXIgfCBodHRwczovL2NyYWNrZWQuaW8vVGhlSGVsbFRvd2VyXSB4NjQgc3VwcG9ydCArIE1ldGhvZCBTZWxlY3Rpb24=");
+            byte[] array = Convert.FromBase64String("W2h0dHBzOi8vZ2l0aHViLmNvbS9UaGVIZWxsVG93ZXIgfCBodHRwczovL2NyYWNrZWQuaW8vVGhlSGVsbFRvd2VyXSB4NjQgc3VwcG9ydCAmIGEgZmV3IG90aGVyIHRoaW5ncyB8IDA2LzI2LzIwMjQ=");
             if (data == null)
                 throw new ArgumentNullException("data");
 

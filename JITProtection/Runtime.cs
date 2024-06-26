@@ -51,13 +51,16 @@ namespace JITProtection
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(ProcessExit);
 
             DLLPath = $"{Path.Combine(Path.GetTempPath(), $"[{Guid.NewGuid().ToString().ToUpper()}]".Replace("[", "{").Replace("]", "}"))}.dll";
-            var s = typeof(Runtime).Assembly.GetManifestResourceStream("DLL");
+            
+            string Runtime = IntPtr.Size == 4 ? "x86" : "x64";
+            
+            var s = typeof(Runtime).Assembly.GetManifestResourceStream($"Runtime_{Runtime}.dll");
             var m = new MemoryStream();
             s.CopyTo(m);
             File.WriteAllBytes(DLLPath, m.ToArray());
-            DLLHandle = Runtime.LoadLibrary(DLLPath);
+            DLLHandle = LoadLibrary(DLLPath);
 
-            ((Invoke_)Marshal.GetDelegateForFunctionPointer(Runtime.GetProcAddress(DLLHandle, "Invoke"), typeof(Runtime.Invoke_)))();
+            ((Invoke_)Marshal.GetDelegateForFunctionPointer(GetProcAddress(DLLHandle, "Invoke"), typeof(Runtime.Invoke_)))();
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

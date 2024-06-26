@@ -36,6 +36,8 @@
             this.guna2ControlBox1 = new Guna.UI2.WinForms.Guna2ControlBox();
             this.TheHellTower = new System.Windows.Forms.CheckedListBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.THTCheckAll = new System.Windows.Forms.CheckBox();
+            this.guna2TextBox2 = new Guna.UI2.WinForms.Guna2TextBox();
             this.SuspendLayout();
             // 
             // guna2BorderlessForm1
@@ -111,9 +113,9 @@
             this.TheHellTower.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.TheHellTower.ForeColor = System.Drawing.Color.Lime;
             this.TheHellTower.FormattingEnabled = true;
-            this.TheHellTower.Location = new System.Drawing.Point(12, 136);
+            this.TheHellTower.Location = new System.Drawing.Point(12, 151);
             this.TheHellTower.Name = "TheHellTower";
-            this.TheHellTower.Size = new System.Drawing.Size(776, 242);
+            this.TheHellTower.Size = new System.Drawing.Size(776, 227);
             this.TheHellTower.TabIndex = 3;
             // 
             // label1
@@ -125,6 +127,43 @@
             this.label1.TabIndex = 5;
             this.label1.Text = "Empty Methods Hidden";
             // 
+            // THTCheckAll
+            // 
+            this.THTCheckAll.AutoSize = true;
+            this.THTCheckAll.Enabled = false;
+            this.THTCheckAll.Location = new System.Drawing.Point(12, 127);
+            this.THTCheckAll.Name = "THTCheckAll";
+            this.THTCheckAll.Size = new System.Drawing.Size(70, 17);
+            this.THTCheckAll.TabIndex = 7;
+            this.THTCheckAll.Text = "Select All";
+            this.THTCheckAll.UseVisualStyleBackColor = true;
+            this.THTCheckAll.CheckedChanged += new System.EventHandler(this.THTCheckAll_CheckedChanged);
+            // 
+            // guna2TextBox2
+            // 
+            this.guna2TextBox2.BorderColor = System.Drawing.Color.DimGray;
+            this.guna2TextBox2.BorderRadius = 1;
+            this.guna2TextBox2.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.guna2TextBox2.DefaultText = "";
+            this.guna2TextBox2.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
+            this.guna2TextBox2.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
+            this.guna2TextBox2.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.guna2TextBox2.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.guna2TextBox2.FillColor = System.Drawing.Color.Black;
+            this.guna2TextBox2.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.guna2TextBox2.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.guna2TextBox2.ForeColor = System.Drawing.Color.Lime;
+            this.guna2TextBox2.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.guna2TextBox2.Location = new System.Drawing.Point(574, 108);
+            this.guna2TextBox2.Name = "guna2TextBox2";
+            this.guna2TextBox2.PasswordChar = '\0';
+            this.guna2TextBox2.PlaceholderText = "Type/Method Name";
+            this.guna2TextBox2.SelectedText = "";
+            this.guna2TextBox2.Size = new System.Drawing.Size(214, 36);
+            this.guna2TextBox2.TabIndex = 8;
+            this.guna2TextBox2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.guna2TextBox2.TextChanged += new System.EventHandler(this.guna2TextBox2_TextChanged);
+            // 
             // Form1
             // 
             this.AllowDrop = true;
@@ -132,6 +171,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.guna2TextBox2);
+            this.Controls.Add(this.THTCheckAll);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.TheHellTower);
             this.Controls.Add(this.guna2ControlBox1);
@@ -156,6 +197,8 @@
         private Guna.UI2.WinForms.Guna2ControlBox guna2ControlBox1;
         private System.Windows.Forms.CheckedListBox TheHellTower;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox THTCheckAll;
+        private Guna.UI2.WinForms.Guna2TextBox guna2TextBox2;
     }
 }
 
