@@ -5,20 +5,29 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace JITProtection
 {
     internal class JIT
     {
-        static Assembly Assembly = null;
         static ModuleDefMD LMFAO = null;
         static byte[] AssemblyByte = null;
         static List<MethodDef> MethodsJITed = new List<MethodDef>();
 
+        public static byte[] PrependBytes(byte[] originalArray, byte[] bytesToPrepend)
+        {
+            byte[] newArray = new byte[originalArray.Length + bytesToPrepend.Length];
+
+            // Copy bytesToPrepend to the start of newArray
+            Array.Copy(bytesToPrepend, 0, newArray, 0, bytesToPrepend.Length);
+
+            // Copy originalArray to newArray after bytesToPrepend
+            Array.Copy(originalArray, 0, newArray, bytesToPrepend.Length, originalArray.Length);
+
+            return newArray;
+        }
         internal static byte[] Execute(ModuleDefMD Module, bool x64, List<string> methods)
         {
-            Assembly = Assembly.LoadFile(Module.Location);
             LMFAO = Module;
             AssemblyByte = null;
 
@@ -44,15 +53,11 @@ namespace JITProtection
                 foreach (MethodDef methodDef in Type.Methods)
                 {
                     if (!methods.Contains(methodDef.FullName)) continue;
-                    MethodBase methodBase = FindReflectionMethod(methodDef);
-                    if (methodBase != null)
-                    {
-                        IList<Instruction> instructions = methodDef.Body.Instructions;
-                        for (int i = 0; i < 5; i++)
-                            instructions.Insert(0, OpCodes.Nop.ToInstruction());
+                    IList<Instruction> instructions = methodDef.Body.Instructions;
+                    for (int i = 0; i < 5; i++)
+                        instructions.Insert(0, OpCodes.Nop.ToInstruction());
 
-                        MethodsJITed.Add(methodDef);
-                    }
+                    MethodsJITed.Add(methodDef);
                 }
             #endregion
 
@@ -61,23 +66,17 @@ namespace JITProtection
             #region "Protect Methods"
             foreach (MethodDef methodDef in MethodsJITed)
             {
-                MethodBase methodBase = FindReflectionMethod(methodDef);
-                if (methodBase == null) continue;
-
-                System.Reflection.MethodBody methodBody = methodBase.GetMethodBody();
-                if (methodBody != null)
+                byte[] ilasByteArray = Module.GetOriginalRawILBytes(methodDef);
+                ilasByteArray = PrependBytes(ilasByteArray, new byte[] { 0, 0, 0, 0, 0 });
+                int size = ilasByteArray.Length;
+                int num2 = SearchArray(AssemblyByte, ilasByteArray);
+                if (num2 != -1)
                 {
-                    byte[] ilasByteArray = methodBody.GetILAsByteArray();
-                    int num = ilasByteArray.Length;
-                    int num2 = SearchArray(AssemblyByte, ilasByteArray);
-                    if (num2 != -1)
+                    EncryptDecrypt(ilasByteArray);
+                    for (int i = 0; i < size; i++)
                     {
-                        EncryptDecrypt(ilasByteArray);
-                        for (int i = 0; i < num; i++)
-                        {
-                            AssemblyByte[num2] = ilasByteArray[i];
-                            num2++;
-                        }
+                        AssemblyByte[num2] = ilasByteArray[i];
+                        num2++;
                     }
                 }
             }
@@ -113,42 +112,6 @@ namespace JITProtection
             return -1;
         }
 
-        static MethodBase FindReflectionMethod(MethodDef method)
-        {
-            try
-            {
-                if (method.IsConstructor)
-                {
-                    foreach (Type type in Assembly.DefinedTypes)
-                        foreach (ConstructorInfo constructorInfo in type.GetConstructors(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
-                        {
-                            ParameterInfo[] parameters = constructorInfo.GetParameters();
-                            if (parameters.Length == method.Parameters.Count)
-                            {
-                                bool flag2 = true;
-                                for (int j = 0; j < parameters.Length; j++)
-                                    if (parameters[j].Name != method.Parameters[j].Name)
-                                        flag2 = false;
-
-                                if (flag2)
-                                    return constructorInfo;
-                            }
-                        }
-                }
-                else
-                {
-                    foreach (TypeInfo typeInfo in Assembly.DefinedTypes)
-                        foreach (MethodInfo methodInfo in typeInfo.DeclaredMethods)
-                            if (methodInfo.Name == method.Name)
-                                return methodInfo;
-                }
-            } catch (Exception ex)
-            {
-                //Need to see what happened
-            }
-            return null;
-        }
-
         private static void UpdateModule(ModuleDefMD M)
         {
             ModuleWriterOptions moduleWriterOptions = new ModuleWriterOptions(M);
@@ -157,7 +120,6 @@ namespace JITProtection
             MemoryStream memoryStream = new MemoryStream();
             M.Write(memoryStream, moduleWriterOptions);
             AssemblyByte = memoryStream.ToArray();
-            Assembly = Assembly.Load(AssemblyByte);
             LMFAO = ModuleDefMD.Load(memoryStream.ToArray());
         }
     }
